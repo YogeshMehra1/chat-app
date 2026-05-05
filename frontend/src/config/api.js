@@ -1,6 +1,19 @@
 // Base API configuration
 export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
-export const WS_BASE_URL = import.meta.env.VITE_WS_BASE_URL || '/ws';
+
+// WebSocket URL - handle production vs development
+const getWebSocketUrl = () => {
+  const wsUrl = import.meta.env.VITE_WS_BASE_URL || '/ws';
+  // If we're in production and have a full API URL, construct WebSocket URL
+  if (import.meta.env.PROD && API_BASE_URL) {
+    const protocol = API_BASE_URL.startsWith('https://') ? 'wss://' : 'ws://';
+    const host = API_BASE_URL.replace(/^https?:\/\//, '');
+    return `${protocol}${host}/ws`;
+  }
+  return wsUrl;
+};
+
+export const WS_BASE_URL = getWebSocketUrl();
 
 // API Endpoints
 export const API_ENDPOINTS = {
