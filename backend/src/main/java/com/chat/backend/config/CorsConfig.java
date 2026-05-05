@@ -21,7 +21,7 @@ public class CorsConfig {
         config.setAllowedOrigins(List.of(
                 "http://localhost:3000",
                 "http://127.0.0.1:3000",
-                "https://chat-eie4rk6wl-ymehra533-gmailcoms-projects.vercel.app",
+               
                 "https://chat-app-eight-beige.vercel.app"
         ));
 
