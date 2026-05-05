@@ -9,6 +9,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -56,9 +57,11 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
+            .cors(cors -> {}) // 🔥 MUST (CORS enable)
             .csrf(csrf -> csrf.disable())
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
+                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // 🔥 PRE-FLIGHT FIX
                 .requestMatchers("/api/auth/**").permitAll()
                 .requestMatchers("/ws/**").permitAll()
                 .requestMatchers("/topic/**").permitAll()
@@ -99,24 +102,22 @@ public class SecurityConfig {
         @Override
         protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
                 throws ServletException, IOException {
-            
+
             final String authHeader = request.getHeader("Authorization");
-            final String jwt;
-            final String username;
 
             if (authHeader == null || !authHeader.startsWith("Bearer ")) {
                 filterChain.doFilter(request, response);
                 return;
             }
 
-            jwt = authHeader.substring(7);
-            username = jwtService.extractUsername(jwt);
+            String jwt = authHeader.substring(7);
+            String username = jwtService.extractUsername(jwt);
 
             if (username != null) {
                 var userDetails = this.userDetailsService.loadUserByUsername(username);
-                
+
                 if (jwtService.validateToken(jwt, userDetails)) {
-                    // Token is valid, but we don't set authentication for WebSocket endpoints
+                    // optional: set authentication if needed
                 }
             }
 
