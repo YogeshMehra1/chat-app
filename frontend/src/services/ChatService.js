@@ -1,6 +1,7 @@
 import SockJS from 'sockjs-client';
 import { Client } from '@stomp/stompjs';
 import AuthService from './AuthService';
+import { API_BASE_URL, WS_BASE_URL, API_ENDPOINTS, WS_TOPICS, WS_DESTINATIONS } from '../config/api';
 
 class ChatService {
   constructor() {
@@ -11,7 +12,7 @@ class ChatService {
 
   async connect() {
     return new Promise((resolve, reject) => {
-      const socket = new SockJS('http://localhost:8080/ws');
+      const socket = new SockJS(WS_BASE_URL);
       
       this.client = new Client({
         webSocketFactory: () => socket,
@@ -234,7 +235,7 @@ class ChatService {
 
   async getRecentMessages() {
     try {
-      const response = await fetch('http://localhost:8080/api/messages');
+      const response = await fetch(API_ENDPOINTS.CHAT.MESSAGES);
       if (!response.ok) {
         throw new Error('Failed to fetch recent messages');
       }
@@ -272,7 +273,7 @@ class ChatService {
         return [];
       }
       
-      const response = await fetch('http://localhost:8080/api/presence/online-users', {
+      const response = await fetch(API_ENDPOINTS.USERS.ONLINE, {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
@@ -301,7 +302,7 @@ class ChatService {
         return [];
       }
       
-      const response = await fetch('http://localhost:8080/api/presence/all-users', {
+      const response = await fetch(API_ENDPOINTS.USERS.ALL, {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
@@ -366,7 +367,7 @@ class ChatService {
 
   async getUserProfile(username) {
     try {
-      const response = await fetch(`http://localhost:8080/api/profile/${username}`, {
+      const response = await fetch(API_ENDPOINTS.USERS.PROFILE(username), {
         headers: {
           'Authorization': `Bearer ${AuthService.getToken()}`,
         },

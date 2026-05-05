@@ -1,3 +1,5 @@
+import { API_ENDPOINTS } from '../config/api';
+
 class AuthService {
     constructor() {
         this.token = localStorage.getItem('token');
@@ -6,7 +8,7 @@ class AuthService {
 
     async login(username, password) {
         try {
-            const response = await fetch('http://localhost:8080/api/auth/login', {
+            const response = await fetch(API_ENDPOINTS.AUTH.LOGIN, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -38,7 +40,7 @@ class AuthService {
 
     async register(username, password, displayName) {
         try {
-            const response = await fetch('http://localhost:8080/api/auth/register', {
+            const response = await fetch(API_ENDPOINTS.AUTH.REGISTER, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
